@@ -27,9 +27,17 @@ def preprocess(text):
     tokens = [stemmer.stem(word) for word in tokens]
     return " ".join(tokens)
 
+# --- Class label mapping ---
+label_map = {
+    0: ("🟥 Hate Speech", "This comment contains hateful or discriminatory language."),
+    1: ("🟧 Offensive", "This comment is offensive but not necessarily hate speech."),
+    2: ("🟩 Neutral", "This comment looks safe and neutral.")
+}
+
+
 # --- Streamlit UI ---
-st.title("📝 Tweet/Comment Classifier")
-st.write("This app classifies tweets or comments based on Hate Speech and Offensive Language.")
+st.title("📝 Tweets/Comments Classifier")
+st.write("Classify tweets or comments into **Hate Speech, Offensive, or Neutral**.")
 
 # User input
 user_input = st.text_area("Enter a tweet or comment:")
@@ -40,7 +48,11 @@ if st.button("Classify"):
         X_new = vectorizer.transform([clean_text])
         prediction = model.predict(X_new)[0]
 
+        # Friendly output
+        label, description = label_map.get(prediction, ("Unknown", "No description available."))
+
         st.subheader("Prediction")
-        st.write(f"Class: **{prediction}**")
+        st.markdown(f"**Category:** {label}")
+        st.info(description)
     else:
         st.warning("Please enter some text before classifying.")
